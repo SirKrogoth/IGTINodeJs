@@ -1,7 +1,6 @@
 import express from "express";
-import {
-    promises as fs
-} from "fs";
+import { promises as fs } from "fs";
+
 
 global.fileName = "accounts.json";
 
@@ -11,7 +10,7 @@ const {
 } = fs;
 const router = express.Router();
 
-router.post('/', async function (req, res) {
+router.post('/', async function (req, res, next) {
     try {
         let account = req.body;
         const data = JSON.parse(await readFile(global.fileName));
@@ -31,42 +30,42 @@ router.post('/', async function (req, res) {
         await writeFile(global.fileName, JSON.stringify(data, null, 2));
 
         res.send(account);
+        global.logger.info(`POST /account - ${JSON.stringify(account)}`);
     } catch (error) {
-        res.status(400).send({
-            err: error.message
-        });
+        next(err);
     }
 })
 
-router.get('/', async function (req, res) {
+router.get('/', async function (req, res, next) {
     try {
         let data = JSON.parse(await readFile(global.fileName));
         //delete irá remover o campo id na visualização 
         delete data.nextId;
         res.send(data);
+        global.logger.info(`GET /account`);
     } catch (err) {
-        res.status(400).send({
-            error: err.message
-        });
+        next(err);
     }
 })
 
-router.get('/:id', async function (req, res) {
+router.get('/:id', async function (req, res, next) {
     try {
         const data = JSON.parse(await readFile(global.fileName));
         const account = data.accounts.find(account => account.id === parseInt(req.params.id));
         if (account === undefined)
             res.send(`${req.params.id} não existe na base de dados.`);
         else
+        {
             res.send(account);
+            global.logger.info(`GET /account/:id - ${req.params.id}`);
+        }
+            
     } catch (err) {
-        res.status(400).send({
-            error: err.message
-        })
+        next(err);
     }
 })
 
-router.delete('/:id', async function (req, res) {
+router.delete('/:id', async function (req, res, next) {
     try {
         const data = JSON.parse(await readFile(global.fileName));
         //o filter irá retornar tudo que é diferente de req.params.id
@@ -76,10 +75,51 @@ router.delete('/:id', async function (req, res) {
 
         //res.end();
         res.send(`Elemento ${req.params.id} removido com sucesso`);
+        global.logger.info(`DELETE /account/:id - ${req.params.id}`);
     } catch (err) {
-        res.status(400).send({
-            erro: err.message
-        });
+        next(err);
     }
 })
+
+router.put("/", async function(req, res, next){
+    try {
+        const account = req.body;
+
+        const data = JSON.parse(await readFile(global.fileName));
+        const index = data.accounts.findIndex(a => a.id === account.id);
+
+        data.accounts[index] = account;
+
+        await writeFile(global.fileName, JSON.stringify(data));
+        delete data.nextId;
+        res.send(data);
+        global.logger.info(`PUT /account - ${JSON.stringify(account)}`);
+    } catch (err) {
+        next(err);
+    }
+})
+
+router.patch("/updateBalance", async function(req, res, next){
+    try {
+        const account = req.body;
+
+        const data = JSON.parse(await readFile(global.fileName));
+        const index = data.accounts.findIndex(a => a.id === account.id);
+
+        data.accounts[index].balance = account.balance;
+
+        await writeFile(global.fileName, JSON.stringify(data));
+    
+        res.send(data.accounts[index]);
+        global.logger.info(`PATCH /account/updateBalance - ${JSON.stringify(account)}`);
+    } catch (err) {
+        next(err);
+    }
+})
+
+router.use((err, req, res, next) => {
+    global.logger.error(`${req.method} ${req.baseUrl} - ${err.message}`);
+    res.status(400).send({error: err.message});
+})
+
 export default router;
