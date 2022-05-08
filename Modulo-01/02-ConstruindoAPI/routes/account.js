@@ -15,11 +15,17 @@ router.post('/', async function (req, res, next) {
         let account = req.body;
         const data = JSON.parse(await readFile(global.fileName));
 
+        if(!account.name || account.balance == null){
+            throw new Error("Name e Balance são obrigatórios. ");
+        }
+
         //Se eu simplesmente criar o ID, ele irá para o final do arquivo, o que pode nao ser interessante
         //Com a abordagem abaixo, trago para cima em destaque o id
         account = {
             id: data.nextId++,
-            ...account
+            //...account
+            name: account.name,
+            balance: account.balance
         }
         //data.nextId++; nao necessário, conforme linha acima. 
         //colocar o ++ depois, significa que primeiro irá implementar e depois acrescentar
@@ -88,12 +94,18 @@ router.put("/", async function(req, res, next){
         const data = JSON.parse(await readFile(global.fileName));
         const index = data.accounts.findIndex(a => a.id === account.id);
 
-        data.accounts[index] = account;
+        if(index == -1){
+            global.logger.info(`PUT /account - ${JSON.stringify(account)} - Registro não encontrado`);
+            throw new Error("Registro não encontrado.");            
+        }
+        else{
+            data.accounts[index] = account;
 
-        await writeFile(global.fileName, JSON.stringify(data));
-        delete data.nextId;
-        res.send(data);
-        global.logger.info(`PUT /account - ${JSON.stringify(account)}`);
+            await writeFile(global.fileName, JSON.stringify(data, null, 2));
+            delete data.nextId;
+            res.send(data);
+            global.logger.info(`PUT /account - ${JSON.stringify(account)}`);
+        }        
     } catch (err) {
         next(err);
     }
@@ -106,17 +118,28 @@ router.patch("/updateBalance", async function(req, res, next){
         const data = JSON.parse(await readFile(global.fileName));
         const index = data.accounts.findIndex(a => a.id === account.id);
 
-        data.accounts[index].balance = account.balance;
+        if(index == -1){
+            global.logger.info(`PATCH /account/updateBalance - ${JSON.stringify(account)} - Registro não encontrado`);
+            throw new Error("Registro não encontrado.");
+        }
+        else if(account.balance == null){
+            global.logger.info(`PATCH /account/updateBalance - ${JSON.stringify(account)} - Balance inválido.`);
+            throw new Error("Balance informado é inválido.");
+        }
+        else{
+            data.accounts[index].balance = account.balance;
 
-        await writeFile(global.fileName, JSON.stringify(data));
-    
-        res.send(data.accounts[index]);
-        global.logger.info(`PATCH /account/updateBalance - ${JSON.stringify(account)}`);
+            await writeFile(global.fileName, JSON.stringify(data));
+        
+            res.send(data.accounts[index]);
+            global.logger.info(`PATCH /account/updateBalance - ${JSON.stringify(account)}`);
+        }        
     } catch (err) {
         next(err);
     }
 })
 
+//logger
 router.use((err, req, res, next) => {
     global.logger.error(`${req.method} ${req.baseUrl} - ${err.message}`);
     res.status(400).send({error: err.message});
