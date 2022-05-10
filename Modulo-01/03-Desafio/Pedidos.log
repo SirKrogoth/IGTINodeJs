@@ -572,3 +572,17 @@
 2022-05-09T22:26:54.502Z [Pedidos-API] info : API iniciada com sucesso...
 2022-05-09T22:26:55.773Z [Pedidos-API] info : API iniciada com sucesso...
 2022-05-09T22:26:57.309Z [Pedidos-API] info : API iniciada com sucesso...
+2022-05-10T11:27:27.304Z [Pedidos-API] info : API iniciada com sucesso...
+2022-05-10T11:28:39.592Z [Pedidos-API] info : POST /pedidos/buscarPedidosCliente
+2022-05-10T11:29:04.517Z [Pedidos-API] info : POST /pedidos/valorCliente - 325.5
+2022-05-10T11:29:37.532Z [Pedidos-API] info : POST /pedidos/valorCliente - 381
+2022-05-10T11:30:25.771Z [Pedidos-API] info : POST /pedidos/buscarPedidosCliente
+2022-05-10T11:31:37.381Z [Pedidos-API] info : POST /pedidos/valorProduto - 1799.5
+2022-05-10T11:32:15.530Z [Pedidos-API] info : POST /pedidos/valorProduto - 1914
+2022-05-10T11:34:27.919Z [Pedidos-API] info : GET /pedidos
+2022-05-10T11:35:55.547Z [Pedidos-API] info : POST /pedidos/valorProduto - 1885
+2022-05-10T11:36:56.739Z [Pedidos-API] info : POST /pedidos/valorCliente - 215.5
+2022-05-10T11:37:43.726Z [Pedidos-API] info : POST /pedidos/valorProduto - 1976
+2022-05-10T11:38:43.866Z [Pedidos-API] info : DELETE /pedidos - 317 - Registro excluído com sucesso.
+2022-05-10T11:39:12.352Z [Pedidos-API] info : POST /pedidos/valorProduto - 2048
+2022-05-10T11:39:36.878Z [Pedidos-API] info : GET /pedidos/:id - 216

@@ -1,5 +1,5 @@
 import express from "express";
-import accountsRouter from "./routes/account.js";
+import accountsRouter from "./routes/account.routes.js";
 import winston from 'winston';
 import cors from 'cors';
 import swagger from 'swagger-ui-express';
