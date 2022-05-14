@@ -4,3 +4,5 @@ npm i nodemon
 npm install winston
 npm i cors
 npm i swagger-ui-express
+//autenticação básica
+npm i express-basic-auth

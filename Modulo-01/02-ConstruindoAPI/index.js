@@ -4,6 +4,7 @@ import winston from 'winston';
 import cors from 'cors';
 import swagger from 'swagger-ui-express';
 import { swaggerDocument } from './doc.js';
+import basicAuth from 'express-basic-auth';
 
 global.fileName = "accounts.json";
 
@@ -31,7 +32,23 @@ app.use(express.json());
 //liberar todos os endpoits externos
 app.use(cors());
 app.use("/doc", swagger.serve, swagger.setup(swaggerDocument));
+
+app.use(basicAuth({
+    authorizer: (username, password) => {
+        const user = basicAuth.safeCompare(username, 'admin');
+        const userPassword = basicAuth.safeCompare(password, 'admin');
+
+        if(user === true && userPassword === true)
+            return true;
+        else
+            return false;
+    }
+}));
+
+
+
 app.use("/account", accountsRouter);
+
 import { cp, promises as fs } from "fs";
 
 const {
